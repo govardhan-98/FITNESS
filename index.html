@@ -136,8 +136,14 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
       <label>Date</label><input id="nDate" type="date" required>
       <div class="row"><div><label>Calories</label><input id="nCalories" type="number" min="0"></div><div><label>Protein (g)</label><input id="nProtein" type="number" min="0"></div></div>
       <div class="row"><div><label>Carbs (g)</label><input id="nCarbs" type="number" min="0"></div><div><label>Fat (g)</label><input id="nFat" type="number" min="0"></div></div>
-      <div class="row"><div><label>Water (L)</label><input id="nWater" type="number" step="0.1" min="0"></div><div><label>Steps</label><input id="nSteps" type="number" min="0"></div></div>
-      <button>Save Nutrition</button>
+<div class="row">
+  <div><label>Water (L)</label><input id="nWater" type="number" step="0.1" min="0" placeholder="3"></div>
+  <div><label>Steps</label><input id="nSteps" type="number" min="0" placeholder="10000"></div>
+</div>
+<div class="row">
+  <div><label>Sleep (hours)</label><input id="nSleep" type="number" step="0.1" min="0" max="24" placeholder="7.5"></div>
+  <div><label>Daily Goal</label><input value="Winter Arc" disabled></div>
+</div>      <button>Save Nutrition</button>
     </form>
   </div>
   <div class="card"><h2>Nutrition History</h2><div id="nutritionList" class="list"></div></div>
@@ -270,8 +276,24 @@ function drawChart(ms){
 }
 $("workoutForm").onsubmit=e=>{e.preventDefault();data.workouts.push({date:$("wDate").value,exercise:$("wExercise").value,muscle:$("wMuscle").value,sets:+$("wSets").value,reps:+$("wReps").value,weight:+$("wWeight").value,notes:$("wNotes").value});e.target.reset();$("wDate").value=today;save();};
 $("measureForm").onsubmit=e=>{e.preventDefault();data.measurements.push({date:$("mDate").value,weight:+$("mWeight").value,waist:$("mWaist").value,chest:$("mChest").value,arm:$("mArm").value,thigh:$("mThigh").value});e.target.reset();$("mDate").value=today;save();};
-$("nutritionForm").onsubmit=e=>{e.preventDefault();const x={date:$("nDate").value,calories:+$("nCalories").value||0,protein:+$("nProtein").value||0,carbs:+$("nCarbs").value||0,fat:+$("nFat").value||0,water:+$("nWater").value||0,steps:+$("nSteps").value||0};data.nutrition=data.nutrition.filter(a=>a.date!==x.date);data.nutrition.push(x);e.target.reset();$("nDate").value=today;save();};
-$("goalForm").onsubmit=e=>{e.preventDefault();data.goals.push({name:$("gName").value,target:+$("gTarget").value,current:+$("gCurrent").value,unit:$("gUnit").value});e.target.reset();save();};
+$("nutritionForm").onsubmit=e=>{
+  e.preventDefault();
+  const x={
+    date:$("nDate").value,
+    calories:+$("nCalories").value||0,
+    protein:+$("nProtein").value||0,
+    carbs:+$("nCarbs").value||0,
+    fat:+$("nFat").value||0,
+    water:+$("nWater").value||0,
+    steps:+$("nSteps").value||0,
+    sleep:+$("nSleep").value||0
+  };
+  data.nutrition=data.nutrition.filter(a=>a.date!==x.date);
+  data.nutrition.push(x);
+  e.target.reset();
+  $("nDate").value=today;
+  save();
+};$("goalForm").onsubmit=e=>{e.preventDefault();data.goals.push({name:$("gName").value,target:+$("gTarget").value,current:+$("gCurrent").value,unit:$("gUnit").value});e.target.reset();save();};
 $("photoInput").onchange=async e=>{for(const f of e.target.files){const src=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f)});data.photos.push({date:today,src});}e.target.value="";save();};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.page).classList.add("active");window.scrollTo(0,0);});
 function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="fitness-backup.json";a.click();}
